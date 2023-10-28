@@ -13,7 +13,10 @@
 
 <form>
     <p>
-        Book: <input type="text" asp-for="SearchString" />
+        <select asp-for="BookName" asp-items="Model.Books">
+            <option value="">All</option>
+        </select>
+        Keyword: <input type="text" asp-for="SearchString" />
         <input type="submit" value="Filter"/>
     </p>
 </form>

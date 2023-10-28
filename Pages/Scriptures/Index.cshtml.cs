@@ -23,30 +23,29 @@ namespace ScriptureSaver.Pages.Scriptures
         public IList<Scripture> Scripture { get;set; } = default!;
         [BindProperty(SupportsGet = true)]
         public string SearchString { get; set; }
+        public SelectList Books { get; set; }
         [BindProperty(SupportsGet = true)]
-        public string Keyword { get; set; }
+        public string BookName { get; set; }
 
         public async Task OnGetAsync()
         {
-            var keywords = from s in _context.Scripture
-                           select s;
+            IQueryable<string> bookQuery = from s in _context.Scripture
+                                           orderby s.Book
+                                           select s.Book;
 
             var scriptures = from s in _context.Scripture
                              select s;
             if (!string.IsNullOrEmpty(SearchString))
             {
-                scriptures = scriptures.Where(s => s.Book.Contains(SearchString));
-                Console.WriteLine(scriptures);
-                Console.WriteLine("trial");
+                scriptures = scriptures.Where(s => s.Notes.Contains(SearchString));
             }
 
-            if(!string.IsNullOrEmpty(Keyword))
+            if (!string.IsNullOrEmpty(BookName))
             {
-                keywords = keywords.Where(s => s.Notes.Contains("Hi"));
-                Console.WriteLine(keywords);
-                Console.WriteLine("hello");
-            }
+                scriptures = scriptures.Where(s => s.Book == BookName);
 
+            }
+            Books = new SelectList(await bookQuery.Distinct().ToListAsync());
             Scripture = await scriptures.ToListAsync();
 
         }
